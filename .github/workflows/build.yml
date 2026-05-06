@@ -1,4 +1,4 @@
-name: Build Alelaskuri APK
+name: Build Alelaskuri APK (stable)
 
 on:
   workflow_dispatch:
@@ -7,20 +7,40 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
 
     container:
       image: kivy/buildozer:latest
 
+    env:
+      DEBIAN_FRONTEND: noninteractive
+      CI: "true"
+      PIP_NO_INPUT: "1"
+
     steps:
+      # 1. Repo
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      # 2. Varmista työtila
+      - name: Show workspace (debug)
+        run: |
+          pwd
+          ls -la
+
+      # 3. Puhdas buildozer-tila
+      - name: Clean build environment
+        run: |
+          rm -rf .buildozer
+          buildozer init || true
+
+      # 4. Build APK (ei SDK-manuaalisäätöjä!)
       - name: Build APK
         run: |
-          buildozer android debug
+          buildozer -v android debug
 
-      - name: Upload APK
+      # 5. Upload APK
+      - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
           name: alelaskuri-apk
