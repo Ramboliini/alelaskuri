@@ -13,8 +13,9 @@ jobs:
       image: kivy/buildozer:latest
 
     env:
-      CI: true
-      BUILD_ZIP: 0
+      CI: "true"
+      BUILD_ZIP: "0"
+      BUILDOZER_WARN_ON_ROOT: "0"
 
     steps:
       - name: Checkout
@@ -22,7 +23,7 @@ jobs:
 
       - name: Build APK
         run: |
-          buildozer --allow-root android debug
+          buildozer android debug -v
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
